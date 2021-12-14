@@ -137,6 +137,10 @@ namespace ft
 			// }
 	};
 
+	template<class Iter>
+		class reverse_iterator : public ft::iterator<
+		typename iterator_traits<Iter>::iterator_category,
+		
 	template <class Iter>
 	class reverse_iterator {
 		typedef Iter													iterator_type;
