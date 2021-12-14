@@ -29,7 +29,7 @@ namespace ft
 			
 
 		protected:
-			pointer 		m_array;
+			pointer 		m_vector;
 			size_type		m_size;
 			size_type		m_capacity;
 			allocator_type	m_allocator;
@@ -38,66 +38,89 @@ namespace ft
 
 			// * ============ MEMBER FUNCTIONS ============ * //
 
-			vector(void) : m_array(NULL), m_size(0), m_capacity(0) {} // replace with nullptr
+			explicit vector(const A& alloc = allocator_type()) : m_vector(NULL), m_size(0), m_capacity(0), m_allocator(alloc) {}
 
-			// explicit vector (const allocator_type& alloc = allocator_type()) : m_array(NULL), m_size(0), m_capacity(0), m_allocator(alloc) {
-			// 	m_array = m_allocator.allocate(1);
-			// }
-
-			explicit vector (size_type n, const value_type& val = value_type(),	const allocator_type& alloc = allocator_type()) : m_size(n), m_capacity(n) {
-				(void)alloc;
-				m_array = m_allocator.allocate(n);
-				for (size_type dist = 0; dist < n; dist++) {
-					m_allocator.construct(m_array + dist, val);
+			explicit vector(size_type n, const value_type& val = value_type(),	const allocator_type& alloc = allocator_type()) : m_size(n), m_capacity(n), m_allocator(alloc) {
+				m_vector = m_allocator.allocate(n);
+				for (size_type i = 0; i < n; i++) {
+					m_allocator.construct(m_vector + i, val);
 				}
 			}
 
-			// vector(iterator first, iterator last, const A& alloc) : m_allocator(alloc) {
-			// 	size_type count = static_cast<size_type>(last - first);
-			// } // not implemented
-			// Vector(const Vector& source) { *this = source; }
-
-			virtual ~vector() {
-				clear();
-				m_allocator.deallocate(m_array, m_capacity);
+			template <class InIter>
+			vector(InIter first, typename std::enable_if<!std::numeric_limits<InIter>::is_integer, InIter>::type last, const allocator_type& alloc = allocator_type()) : m_allocator(alloc) {
+				m_size = static_cast<size_type>(last - first);
+				m_capacity = m_size;
+				m_vector = m_allocator.allocate(m_capacity);
+				for (size_type i = 0; i < m_size; i++)	{
+					m_allocator.construct(m_vector + i, *(first + i));
+				}
 			}
 
-			vector& operator= ( const vector &source ) {
-				if (this == &source)
+			vector(const vector& X) {
+				m_vector = m_allocator.allocate(0);
+        		reserve(X.capacity());
+				try
+				{
+					for (size_type i = 0; i < X.size(); i++)
+						m_allocator.construct(m_vector + i, *(X.m_vector + i));
+				}
+				catch(...)
+				{
+					clear();
+					m_allocator.deallocate(m_vector, m_capacity);
+				}
+			 }
+
+			virtual ~vector() {
+				m_allocator.destroy(m_vector);
+				m_allocator.deallocate(m_vector, m_capacity);
+			}
+
+			vector& operator=(const vector &X) {
+				if (this == &X)
 					return *this;
-				this->~vector();
-				m_array = m_allocator.allocate(source.m_capacity);
-				m_size = source.m_size;
-				m_capacity = source.m_capacity;
-				for (size_type dist = 0; dist < m_size; dist++)	{
-					m_allocator.construct(m_array + dist, *(source.m_array + dist));
+				else if (X.size() == 0) { clear(); }
+				else if (X.size() <= size()) {
+					for (size_type i = 0; i < X.size(); i++)
+						m_vector[i] = X.m_vector[i];
+				}
+				else if (X.size() <= capacity()) {
+					for (size_type i = 0; i < X.size(); i++)
+						m_vector[i] = X.m_vector[i];
+				}
+				else {
+					m_allocator.deallocate(m_vector, m_capacity);
+					m_vector = m_allocator.allocate(X.capacity());
+					for (size_type i = 0; i < X.size(); i++)
+						m_allocator.construct(m_vector + i, *(X.m_vector + i));
 				}
 				return *this;
 			}
 
 			void assign(size_type n, const T& val) {
 				clear();
-				m_allocator.deallocate(m_array, m_capacity);
-				m_array = m_allocator.allocate(n);
+				m_allocator.deallocate(m_vector, m_capacity);
+				m_vector = m_allocator.allocate(n);
 				m_capacity = n;
 				m_size = n;
 				for (size_type dist = 0; dist < n; dist++)	{
-					m_allocator.construct(m_array + dist, val);
+					m_allocator.construct(m_vector + dist, val);
 				}
 			}
 
 			template<class Iter>
 			void assign(Iter first, typename std::enable_if<!std::numeric_limits<Iter>::is_integer,Iter>::type last)	{
 				clear();
-				m_allocator.deallocate(m_array, m_capacity);
+				m_allocator.deallocate(m_vector, m_capacity);
 				size_type count = static_cast<size_type>(last - first);
-				m_array = m_allocator.allocate(count);
+				m_vector = m_allocator.allocate(count);
 				m_capacity = count;
 				m_size = count;
 				size_type dist = 0;
 				for (; first != last; first++)
 				{
-					m_allocator.construct(m_array + dist, *first);
+					m_allocator.construct(m_vector + dist, *first);
 					dist++;
 				}
 			}
@@ -130,20 +153,20 @@ namespace ft
 
 			int* data() { 
 				if (m_size) {
-					return (int *)reinterpret_cast<std::ptrdiff_t>(&m_array); 
+					return (int *)reinterpret_cast<std::ptrdiff_t>(&m_vector); 
 				}
 				return NULL;
 			}
 			
 			// * ============ ITERATORS ============ * //
 
-			iterator begin(void) { return iterator(m_array); }
+			iterator begin(void) { return iterator(m_vector); }
 
-			const_iterator begin(void) const { return const_iterator(m_array); }
+			const_iterator begin(void) const { return const_iterator(m_vector); }
 
-			iterator end(void) { return iterator(m_array + m_size); }
+			iterator end(void) { return iterator(m_vector + m_size); }
 
-			const_iterator end(void) const { return const_iterator(m_array + m_size); }
+			const_iterator end(void) const { return const_iterator(m_vector + m_size); }
 
 			reverse_iterator rbegin(void) { return reverse_iterator(end()); }
 
@@ -167,11 +190,11 @@ namespace ft
 				if (n > m_capacity) {
 					pointer temp = m_allocator.allocate(n);
 					for (size_type i = 0; i < m_size; i++) {
-						temp[i] = m_array[i];
+						temp[i] = m_vector[i];
 					}
-					m_allocator.deallocate(m_array, m_capacity);
+					m_allocator.deallocate(m_vector, m_capacity);
 					m_capacity = n;
-					m_array = temp;
+					m_vector = temp;
 				}
 			}
 
@@ -182,28 +205,45 @@ namespace ft
 			void clear() { erase(begin(), end()); }
 
 			iterator insert(iterator pos, const T& val) {
-				if (m_capacity == 0) {
-					reserve(1);
-					m_array[0] = val;
+				if (m_capacity == 0)
+				{
+					reserve(4);
+					m_allocator.construct(m_vector + 0, val);
 					m_size++;
 					return begin();
 				}
-				if (m_capacity == m_size) {
+				if (m_capacity == m_size)
+				{
 					reserve(m_capacity << 1);
 				}
-				for (size_type dist = m_size; dist != static_cast<size_type>(pos - begin()); dist--) {
-					m_allocator.construct(m_array + dist, m_array[dist - 1]);
+				for (size_type i = m_size; i != static_cast<size_type>(pos - begin()); i--)
+				{
+					m_allocator.construct(m_vector + i, m_vector[i - 1]);
 				}
-				m_allocator.construct(m_array + static_cast<size_type>(pos - begin()), val);
+				m_allocator.construct(m_vector + static_cast<size_type>(pos - begin()), val);
 				m_size++;
 				return pos;
 			}
 
+			// void insert(iterator pos, size_type n, const T& val) {
+			// 	if (m_capacity == 0) {
+			// 		reserve(n);
+			// 		for (size_type i = 0; i < n; i++)
+			// 			m_allocator.construct(m_vector + i, val);
+			// 		m_size = n;
+			// 		return begin();
+			// 	}
+			// 	if 
+			// }
+
+			// template<class InIter>
+			// 	void insert(iterator pos, InIter first, InIter last)
+
 			iterator erase(iterator pos) {
 				difference_type diff = pos - begin();
-				m_allocator.destroy(m_array + diff);
+				m_allocator.destroy(m_vector + diff);
 				for (size_type dist = static_cast<size_type>(diff); dist < m_size - 1; dist++){
-					m_allocator.construct(m_array + dist, m_array[dist + 1]);
+					m_allocator.construct(m_vector + dist, m_vector[dist + 1]);
 				}
 				m_size--;
 				return pos;
@@ -215,10 +255,10 @@ namespace ft
         		if (first != last) {
             		size_type destr = last - begin();
 					for (size_type dist = static_cast<size_type>(first - begin()); dist < destr; dist++) {
-						m_allocator.destroy(m_array + dist);
+						m_allocator.destroy(m_vector + dist);
 					}
 					for (size_type dist = static_cast<size_type>(first - begin()); dist < m_size - (last - first); dist++) {
-						m_allocator.construct(m_array + dist, m_array[dist + (last - first)]);
+						m_allocator.construct(m_vector + dist, m_vector[dist + (last - first)]);
 					}
 					m_size -= (last - first);
 				}
@@ -231,7 +271,7 @@ namespace ft
 			void push_back(const value_type& val) {
 				if (m_capacity == 0) { reserve(1); }
 				else if (m_capacity == m_size) { reserve(m_capacity << 1); }
-				m_array[m_size] = val;
+				m_vector[m_size] = val;
 				m_size++;
 			}
 
@@ -240,7 +280,7 @@ namespace ft
 			void resize(size_type n) {
 				if (m_capacity < n) { reserve(n); }
 				for (size_type i = m_size; i < n; i++) {
-					m_array[i] = 0;
+					m_vector[i] = 0;
 				}
 				m_size = n;
 			}
@@ -249,7 +289,7 @@ namespace ft
 				if (m_capacity < n) {
 					reserve(n);
 					for (size_type i = m_size; i < n; i++) {
-						m_array[i] = val;
+						m_vector[i] = val;
 					}
 				}
 				m_size = n;
