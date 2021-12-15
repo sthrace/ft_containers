@@ -3,6 +3,11 @@
 
 #include <memory>
 
+// 1. InputIterator -->  / *it, ++, == /  You can only iterate over collection once
+// 2. ForwardIterator --> InputIterator with multiple iteration guarantee
+BidirectionalIterator
+RandomAccessItertor
+
 namespace ft
 {
 	struct input_iterator_tag {};
