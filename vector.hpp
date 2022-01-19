@@ -60,13 +60,11 @@ namespace ft
 			vector(const vector& X) {
 				m_vector = m_allocator.allocate(0);
         		reserve(X.capacity());
-				try
-				{
+				try	{
 					for (size_type i = 0; i < X.size(); i++)
 						m_allocator.construct(m_vector + i, *(X.m_vector + i));
 				}
-				catch(...)
-				{
+				catch(...)	{
 					clear();
 					m_allocator.deallocate(m_vector, m_capacity);
 				}
@@ -205,19 +203,16 @@ namespace ft
 			void clear() { erase(begin(), end()); }
 
 			iterator insert(iterator pos, const T& val) {
-				if (m_capacity == 0)
-				{
+				if (m_capacity == 0) {
 					reserve(4);
 					m_allocator.construct(m_vector + 0, val);
 					m_size++;
 					return begin();
 				}
-				if (m_capacity == m_size)
-				{
+				if (m_capacity == m_size) {
 					reserve(m_capacity << 1);
 				}
-				for (size_type i = m_size; i != static_cast<size_type>(pos - begin()); i--)
-				{
+				for (size_type i = m_size; i != static_cast<size_type>(pos - begin()); i--)	{
 					m_allocator.construct(m_vector + i, m_vector[i - 1]);
 				}
 				m_allocator.construct(m_vector + static_cast<size_type>(pos - begin()), val);
@@ -236,8 +231,25 @@ namespace ft
 			// 	if 
 			// }
 
-			// template<class InIter>
-			// 	void insert(iterator pos, InIter first, InIter last)
+			template<class InIter>
+			void insert(iterator pos, InIter first, InIter last) {
+				if (m_capacity == 0) {
+					reserve(4);
+					m_allocator.construct(m_vector + 0, val);
+					m_size++;
+					return begin();
+				}
+				if (m_capacity == m_size) {
+					reserve(m_capacity << 1);
+				}
+				while (first != last) {
+					m_allocator.construct(m_vector + static_cast<size_type>(pos - begin()), *last);
+					pos++;
+					last--;
+					m_size++;
+				}
+			}
+
 
 			iterator erase(iterator pos) {
 				difference_type diff = pos - begin();

@@ -3,9 +3,10 @@
 
 # include "vector.hpp"
 # include <vector>
+# include <deque>
 
 namespace ft {
-	template<typename T, class C=std::vector<T> > 
+	template<typename T, class C=ft::vector<T> > 
 	class stack	{
 		public:
 			typedef C						container_type;

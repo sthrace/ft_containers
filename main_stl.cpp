@@ -5,7 +5,7 @@
 
 int	main()
 {
-	ft::Stack<int> test;
+	ft::stack<int> test;
 
 	std::cout << "Stack initialized\n";
 	

@@ -34,7 +34,6 @@ namespace ft {
 			bool operator>=(const T& X, const T&Y) { return (!(X < Y)); }
 		}
 	};
-	}
-}
+};
 
 #endif
