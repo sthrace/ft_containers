@@ -35,6 +35,37 @@ void my_advance(Iterator& iter, int n) {
 	my_advance_helper(iter, typename std::iterator_traits<Iterator>::iterator_category(), n);
 }
 
+template<bool B, typename U, typename V>
+struct conditional {
+	using type = V;
+};
+
+template<typename U, typename V>
+struct conditional<true, U, V> {
+	using type = U;
+};
+
+template<bool B, typename U, typename V>
+struct conditional<true, U, V> {
+	using conditional_t = typename conditional<B, U, V>::type;
+};
+
+class vector {
+
+private:
+	template<bool IsConst>
+	struct common_iterator {
+		std::conditional_t<IsConst, const T*, T*> ptr;
+		T* ptr;
+	};
+
+public:
+	using iterator = common_iterator<false>;
+	using const_iterator = common_iterator<true>;
+
+};
+
+
 int main() {
 	std::set<int> s;
 	for (int i = 0; i < 100; ++i) {
