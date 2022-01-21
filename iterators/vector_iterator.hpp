@@ -108,6 +108,10 @@ namespace ft {
 		difference_type operator-(vector_iterator const &source) const {
 			return (this->ptr - source.ptr);
 		}
+
+		pointer	base() const {
+			return ptr;
+		}
 	};
 }
 

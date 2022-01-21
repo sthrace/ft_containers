@@ -394,10 +394,10 @@
 # include <memory>
 # include <limits>
 # include <stdexcept>
-# include "./iterators/reverse_iterator.hpp"
-# include "./common/algorithm.hpp"
-# include "./common/type_traits.hpp"
-# include "./common/utility.hpp"
+# include "../iterators/reverse_iterator.hpp"
+# include "../common/algorithm.hpp"
+# include "../common/type_traits.hpp"
+# include "../common/utility.hpp"
 
 namespace ft
 {
@@ -430,20 +430,20 @@ namespace ft
 
 			template <typename Iter>
 			vector(Iter first, Iter last, const allocator_type& alloc = allocator_type()) {
-				Construct(first, last, Iter_cat(first)); 				
+				Construct(first, last); 				
 			}
 
 			template<typename Iter>
-			void Construct(Iter first, Iter last, ft::input_iterator_tag) {
+			void Construct(Iter first, Iter last, typename ft::enable_if<!std::is_integral<Iter>::value, Iter>::type* = 0) {
 				Buy(0);
 				insert(begin(), first, last);
 			}
 
 			template<typename Iter>
-			void Construct(Iter first, Iter last, ft::enable_if<!std::numeric_limits<Iter>::is_integral>) {
+			void Construct(Iter first, Iter last, typename ft::enable_if<std::is_integral<Iter>::value, Iter>::type* = 0) {
 				size_type N = (size_type)first;
 				if (Buy(N)) {
-					last = Ufill(first, N, (T)last);
+					_last = Ufill(_first, N, (T)last);
 				}
 			}
 
@@ -478,10 +478,31 @@ namespace ft
 				return *this;
 			}
 
+			void reserve(size_type N) {
+				if (max_size() < N) { Xlen(); }
+				else if (capacity() < N) {
+					pointer Q = _alloc.allocate(N, (void *)0);
+					try {
+						Ucopy(begin(), end(), Q);
+					}
+					catch(...) {
+						_alloc.deallocate(Q, N);
+						throw;
+					}
+					if (_first != 0) {
+						Destroy(_first,_last);
+						_alloc.deallocate(_first, _end - _first);
+					}
+					_end = Q + N;
+					_last = Q + N;
+					_first = Q;
+				}
+			}
+
+			size_type capacity() const { return _first == 0 ? 0 : _end - _first; }			
 
 			// * ============ ITERATORS ============ * //
 
-			size_type capacity() const { return (_first == 0 ? 0 : _end - _first); }
 
 			iterator begin(void) { return iterator(_first); }
 
@@ -510,11 +531,11 @@ namespace ft
 					erase(begin() + N, end());
 			}
 
-			size_type size() const { return (_first == 0 ? 0 : _last - _first); }
+			size_type size() const { return _first == 0 ? 0 : _last - _first; }
 
-			size_type max_size() const { return (_alloc.max_size()); }
+			size_type max_size() const { return _alloc.max_size(); }
 
-			bool empty() const { return (size() == 0); }
+			bool empty() const { return size() == 0; }
 
 			allocator_type get_allocator() const { return _alloc; }
 
@@ -522,16 +543,152 @@ namespace ft
 				if (size() <= idx) {
 					Xran();
 				}
-				return (*(begin() + idx));
+				return *(begin() + idx);
 			}
 
 			const_reference at(size_type idx) const {
 				if (size() <= idx) {
 					Xran();
 				}
-				return (*(begin() + idx));
+				return *(begin() + idx);
 			}
 
+			reference operator[](size_type idx) { return *(begin() + idx); }
+
+			const_reference operator[](size_type idx) const { return *(begin() + idx); }
+
+			reference front() { return *begin(); }
+
+			const_reference front() const { return *begin(); }
+
+			reference back() { return *(end() - 1); }
+
+			const_reference back() const { return *(end() - 1); }
+
+			void push_back(const T& X) {
+				insert(end(), X);
+			}
+
+			void pop_back() {
+				erase(end() - 1);
+			}
+
+			template<typename Iter>
+			void assign(Iter first, Iter last) {
+				assign(first, last);
+			}
+
+			template<typename Iter>
+			void assign(Iter first, Iter last, typename ft::enable_if<!std::numeric_limits<Iter>::is_integral>::type = 0) {
+				assign((size_type)first, (T)last);
+			}
+
+			template<typename Iter>
+			void assign(Iter first, Iter last, typename ft::enable_if<std::numeric_limits<Iter>::is_integral>::type = 0) {
+				erase(begin(), end());
+				insert(begin(), first, last);
+			}
+
+			void assign(size_type N, const T &X) {
+				T Tx = X;
+				erase(begin(), end());
+				insert(begin(), N, Tx);
+			}
+
+			iterator insert(iterator pos, const T &X) {
+				size_type offset = size() == 0 ? 0 : pos - begin();
+				insert(pos, (size_type)1, X);
+				return begin() + offset;
+			}
+
+			void insert(iterator pos, size_type M, const T &X) {
+				T Tx = X;
+				size_type N = capacity();
+				if (M == 0) { ; }
+				else if (max_size() - size() < M) { Xlen(); }
+				else if (N < size() + M) {
+					N = max_size() - N / 2 < N ? 0 : N + N / 2;
+					if (N < size() + M) {
+						N = size() + M;
+					}
+					pointer S = _alloc.allocate(N, (void *)0);
+					pointer Q;
+					try {
+						Q = Ucopy(begin(), pos, S);
+						Q = Ufill(Q, M, Tx);
+						Ucopy(pos, end(), Q);
+					}
+					catch(...) {
+						Destroy(S, Q);
+						_alloc.deallocate(S, N);
+						throw;
+					}
+					if (_first != 0) {
+						Destroy(_first, _last);
+						_alloc.deallocate(_first, _end - _first);
+						_end = S + N;
+						_last = S + size() + M;
+						_first = S;
+					}
+				}
+				else if ((size_type)(end() - pos) < M) {
+					Ucopy(pos, end(), pos.base() + M);
+					try {
+						Ufill(_last, M - (end() - pos), Tx);
+					}
+					catch(...) {
+						Destroy(pos.base() + M, _last + M);
+						throw;
+					}
+					_last += M;
+					fill(pos, end() - M, Tx);
+				}
+				else {
+					iterator Oend = end();
+					_last = Ucopy(Oend - M, Oend, _last);
+					copy_backward(pos, Oend - M, Oend);
+					fill(pos, pos + M, Tx);
+				}
+			}
+
+			iterator erase(iterator pos) {
+				copy(pos + 1, end(), pos);
+				Destroy(_last - 1, _last);
+				--_last;
+				return pos;
+			}
+
+			iterator erase(iterator first, iterator last) {
+				if (first != last) {
+					pointer S = copy(last, end(), first.base());
+					Destroy(S, _last);
+					_last = S;
+				}
+				return first;
+			}
+
+			void clear() { erase(begin(), end()); }
+
+			bool Eq(const vector &X) const {
+				return (size() == X.size() && equal(begin(), end(), X.begin()));
+			}
+
+			bool Lt(const vector &X) const {
+				return ft::lexicographical_compare(begin(), end(), X.begin(), X.end());
+			}
+
+			void swap(vector &X) {
+				if (_alloc == X._alloc) {
+					std::swap(_first, X._first);
+					std::swap(_last, X._last);
+					std::swap(_end, X._end);
+				}
+				else {
+					vector Ts = *this; 
+					*this = X;
+					X = Ts;
+				}
+			}
 
 			protected:
 				pointer _first, _last, _end;
@@ -586,11 +743,12 @@ namespace ft
 						Destroy(Qs, Q);
 						throw;
 					}
+					return Q;
 				}
 
-				void Xlen() const { throw length_error("vector<T> too long"); }
+				void Xlen() const { throw std::length_error("vector<T> too long"); }
 
-				void Xran() const { throw out_of_range("vector<T> subscript"); }
+				void Xran() const { throw std::out_of_range("vector<T> subscript"); }
 
 	}; // class vector
 } // namespace
