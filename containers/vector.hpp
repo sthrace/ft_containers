@@ -394,6 +394,8 @@
 # include <memory>
 # include <limits>
 # include <stdexcept>
+# include "../iterators/iterator.hpp"
+# include "../iterators/vector_iterator.hpp"
 # include "../iterators/reverse_iterator.hpp"
 # include "../common/algorithm.hpp"
 # include "../common/type_traits.hpp"
@@ -460,7 +462,7 @@ namespace ft
 				if (this == &X) { ; }
 				else if (X.size() == 0) { Clear(); }
 				else if (X.size() <= size()) {
-					pointer Q = copy(X.begin(), X.end(), _first);
+					pointer Q = ft::copy(X.begin(), X.end(), _first);
 					Destroy(Q, _last);
 					_last = _first + X.size();
 				}
@@ -641,18 +643,73 @@ namespace ft
 						throw;
 					}
 					_last += M;
-					fill(pos, end() - M, Tx);
+					ft::fill(pos, end() - M, Tx);
 				}
 				else {
 					iterator Oend = end();
 					_last = Ucopy(Oend - M, Oend, _last);
-					copy_backward(pos, Oend - M, Oend);
-					fill(pos, pos + M, Tx);
+					ft::copy_backward(pos, Oend - M, Oend);
+					ft::fill(pos, pos + M, Tx);
 				}
 			}
 
+			template<typename Iter>
+			void insert(iterator pos, Iter first, Iter last) {
+				size_type M = ft::distance(first, last);
+				size_type N = capacity();
+				if (M == 0) { ; }
+				else if (max_size() - size() < M) {
+					Xlen();
+				}
+				else if (N < size() + M) {
+					N = max_size() - N / 2 < N ? 0 : N + N / 2;
+					if (N < size() + M)
+						N = size() + M;
+					pointer S = _alloc.allocate(N, (void *)0);
+					pointer Q;
+					try {
+						Q = Ucopy(begin(), pos,S);
+						Q = Ucopy(first, last, Q);
+						Ucopy(pos, end(), Q);
+					} 
+					catch(...) {
+						Destroy(S, Q);
+						_alloc.deallocate(S, N);
+						throw;
+					}
+					if (_first != 0) {
+						Destroy(_first, _last);
+						_alloc.deallocate(_first, _end - _first);
+					}
+					_end = S + N;
+					_last = S + size() + M;
+					_first = S;
+				}
+				else if ((size_type)(end() - pos) < M) {
+					Ucopy(pos, end(), pos.base() + M);
+					Iter Mid = first;
+					ft::advance(Mid, end() - pos);
+					try {
+						Ucopy(Mid, last, _last);
+					}
+					catch(...) {
+						Destroy(pos.base() + M, _last + M);
+						throw;
+					}
+					_last += M;
+					ft::copy(first, Mid, pos);
+				}
+				else if (0 < M) {
+					iterator Oend = end();
+					_last = Ucopy(Oend - M, Oend, _last);
+					ft::copy_backward(pos, Oend - M, Oend);
+					ft::copy(first, last, pos);
+				}
+			}
+
+
 			iterator erase(iterator pos) {
-				copy(pos + 1, end(), pos);
+				ft::copy(pos + 1, end(), pos);
 				Destroy(_last - 1, _last);
 				--_last;
 				return pos;
@@ -660,7 +717,7 @@ namespace ft
 
 			iterator erase(iterator first, iterator last) {
 				if (first != last) {
-					pointer S = copy(last, end(), first.base());
+					pointer S = ft::copy(last, end(), first.base());
 					Destroy(S, _last);
 					_last = S;
 				}
@@ -670,7 +727,7 @@ namespace ft
 			void clear() { erase(begin(), end()); }
 
 			bool Eq(const vector &X) const {
-				return (size() == X.size() && equal(begin(), end(), X.begin()));
+				return (size() == X.size() && ft::equal(begin(), end(), X.begin()));
 			}
 
 			bool Lt(const vector &X) const {
@@ -679,9 +736,9 @@ namespace ft
 
 			void swap(vector &X) {
 				if (_alloc == X._alloc) {
-					std::swap(_first, X._first);
-					std::swap(_last, X._last);
-					std::swap(_end, X._end);
+					ft::swap(_first, X._first);
+					ft::swap(_last, X._last);
+					ft::swap(_end, X._end);
 				}
 				else {
 					vector Ts = *this; 
@@ -751,6 +808,29 @@ namespace ft
 				void Xran() const { throw std::out_of_range("vector<T> subscript"); }
 
 	}; // class vector
+
+	// * ============ NON MEMBER FUNATIONS ============ * //
+
+template<class T, class A>
+	bool operator==(const vector<T, A>& lhs, const vector<T, A>& rhs) { return lhs.Eq(rhs); }
+
+template<class T, class A>
+	bool operator!=(const vector<T, A>& lhs, const vector<T, A>& rhs) { return !(lhs == rhs); }
+
+template<class T, class A>
+	bool operator<(const vector<T, A>& lhs, const vector<T, A>& rhs) { return lhs.Lt(rhs); }
+
+template<class T, class A>
+	bool operator<=(const vector<T, A>& lhs, const vector<T, A>& rhs) { return !(rhs < lhs); }
+
+template<class T, class A>
+	bool operator>(const vector<T, A>& lhs, const vector<T, A>& rhs) { return rhs < lhs; }
+
+template<class T, class A>
+	bool operator>=(const vector<T, A>& lhs, const vector<T, A>& rhs) { return !(rhs > lhs); }
+
+template <class T, class Alloc>
+	void swap (vector<T,Alloc>& lhs, vector<T,Alloc>&rhs) {	lhs.swap(rhs); }
 } // namespace
 
 #endif

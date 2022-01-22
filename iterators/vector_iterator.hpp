@@ -3,27 +3,8 @@
 
 # include "iterator.hpp"
 
-
 namespace ft {
 	template<typename T>
-	struct iterator_traits<T*> {
-		typedef ft::random_access_iterator_tag		iterator_category;
-		typedef T									value_type;
-		typedef std::ptrdiff_t						difference_type;
-		typedef T*									pointer;
-		typedef T&									reference;
-	};
-
-	template<typename T>
-	struct iterator_traits<const T*> {
-		typedef ft::random_access_iterator_tag		iterator_category;
-		typedef T									value_type;
-		typedef std::ptrdiff_t						difference_type;
-		typedef const T*							pointer;
-		typedef const T&							reference;
-	};
-
-	template <typename T>
 	class vector_iterator : public ft::iterator<random_access_iterator_tag, T> {
 	public:
 		typedef typename ft::iterator<ft::random_access_iterator_tag, T>::iterator_category	iterator_category;

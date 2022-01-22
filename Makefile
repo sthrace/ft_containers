@@ -46,7 +46,7 @@ re:			fclean all
 
 git:		fclean
 			git add Makefile
-			git add *.?pp
+			git add *
 			git commit -m "commit"
 			git push
 

@@ -1,7 +1,7 @@
 #ifndef ITERATOR_HPP
 # define ITERATOR_HPP
 
-#include <memory>
+# include <cstddef>
 
 namespace ft
 {
@@ -29,22 +29,41 @@ namespace ft
 		typedef typename Iter::reference			reference;
 	};
 
-	template <typename InIter, typename Distance>
-	void	my_distancehelper(InIter first, InIter last, Distance& result, ft::input_iterator_tag) {
+	template<typename T>
+	struct iterator_traits<T*> {
+		typedef ft::random_access_iterator_tag		iterator_category;
+		typedef T									value_type;
+		typedef std::ptrdiff_t						difference_type;
+		typedef T*									pointer;
+		typedef T&									reference;
+	};
+
+	template<typename T>
+	struct iterator_traits<const T*> {
+		typedef ft::random_access_iterator_tag		iterator_category;
+		typedef T									value_type;
+		typedef std::ptrdiff_t						difference_type;
+		typedef const T*							pointer;
+		typedef const T&							reference;
+	};
+
+
+	template <typename InIter, typename D>
+	void	my_distance_helper(InIter first, InIter last, D& N, ft::input_iterator_tag) {
 		for(; first != last; ++first)
-			++result;
+			++N;
 	}
 
-	template <typename RanIt, typename Distance>
-	void	my_distance_helper(RanIt first, RanIt last, Distance& result, ft::random_access_iterator_tag) {
-		result = last - first;
+	template <typename RanIt, typename D>
+	void	my_distance_helper(RanIt first, RanIt last, D& N, ft::random_access_iterator_tag) {
+		N += last - first;
 	}
 
 	template <typename InIter>
-	typename ft::iterator_traits<InIter>::difference_type	distance (InIter first, InIter last) {
-		typename ft::iterator_traits<InIter>::difference_type result = 0;
-		my_distance_helper(first, last, result, typename ft::iterator_traits<InIter>::iterator_category());
-		return result;
+	typename ft::iterator_traits<InIter>::difference_type distance (InIter first, InIter last) {
+		typename ft::iterator_traits<InIter>::difference_type N = 0;
+		my_distance_helper(first, last, N, typename ft::iterator_traits<InIter>::iterator_category());
+		return N;
 	}
 
 	template<typename Iterator, typename IterCategory>
