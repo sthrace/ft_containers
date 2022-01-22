@@ -62,7 +62,7 @@ namespace ft
 	template <typename InIter>
 	typename ft::iterator_traits<InIter>::difference_type distance (InIter first, InIter last) {
 		typename ft::iterator_traits<InIter>::difference_type N = 0;
-		my_distance_helper(first, last, N, typename std::iterator_traits<InIter>::iterator_category());
+		my_distance_helper(first, last, N, typename ft::iterator_traits<InIter>::iterator_category());
 		return N;
 	}
 
