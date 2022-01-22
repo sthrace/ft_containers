@@ -48,8 +48,8 @@ namespace ft
 	};
 
 
-	template <typename InIter, typename D>
-	void	my_distance_helper(InIter first, InIter last, D& N, ft::input_iterator_tag) {
+	template <typename InIter, typename D, typename IterCategory>
+	void	my_distance_helper(InIter first, InIter last, D& N, IterCategory) {
 		for(; first != last; ++first)
 			++N;
 	}

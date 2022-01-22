@@ -567,6 +567,13 @@ namespace ft
 
 			const_reference back() const { return *(end() - 1); }
 
+			int* data() { 
+				if (size()) {
+					return (int *)reinterpret_cast<std::ptrdiff_t>(&_first); 
+				}
+				return NULL;
+			}
+
 			void push_back(const T& X) {
 				insert(end(), X);
 			}
