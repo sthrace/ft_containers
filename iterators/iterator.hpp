@@ -1,8 +1,6 @@
 #ifndef ITERATOR_HPP
 # define ITERATOR_HPP
 
-# include <cstddef>
-
 namespace ft
 {
 	struct input_iterator_tag {};
