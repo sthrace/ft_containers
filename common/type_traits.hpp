@@ -5,11 +5,11 @@ namespace ft {
 
 	// === ENABLE IF === //
 
-	template<bool B, class T = void>
+	template<bool B>
 	struct enable_if {};
  
-	template<class T>
-	struct enable_if<true, T> { typedef T type; };
+	template<>
+	struct enable_if<true> { typedef int type; };
 
 	// === IS INTEGRAL === //
 

@@ -7,10 +7,9 @@ namespace ft
 {
 	struct input_iterator_tag {};
 	struct output_iterator_tag {};
-	struct forward_iterator_tag : public input_iterator_tag { };
-	struct bidirectional_iterator_tag : public forward_iterator_tag { };
+	struct forward_iterator_tag : public input_iterator_tag {};
+	struct bidirectional_iterator_tag : public forward_iterator_tag {};
 	struct random_access_iterator_tag : public bidirectional_iterator_tag {};
-	struct Int_iterator_tag {};
 
 	template <typename C, typename T, typename Dist = std::ptrdiff_t, typename Pt = T*, typename Rt = T&>
 	struct iterator {
@@ -22,12 +21,12 @@ namespace ft
 	};
 
 	template<typename T, typename D, typename Pt, typename Rt>
-	struct BidIt : public iterator<ft::bidirectional_iterator_tag, T, D, Pt, Rt> {};
+	struct BidIt : public iterator<bidirectional_iterator_tag, T, D, Pt, Rt> {};
 
 	template<typename T, typename D, typename Pt, typename Rt>
-	struct RanIt : public iterator<ft::random_access_iterator_tag, T, D, Pt, Rt> {};
+	struct RanIt : public iterator<random_access_iterator_tag, T, D, Pt, Rt> {};
 
-	struct OutIt : public iterator<ft::output_iterator_tag, void, void, void, void> {};
+	struct OutIt : public iterator<output_iterator_tag, void, void, void, void> {};
 
 	template <typename Iter>
 	struct iterator_traits {
@@ -40,7 +39,7 @@ namespace ft
 
 	template <typename T>
 	struct iterator_traits<T*> {
-		typedef ft::random_access_iterator_tag		iterator_category;
+		typedef random_access_iterator_tag		iterator_category;
 		typedef T									value_type;
 		typedef std::ptrdiff_t						difference_type;
 		typedef T*									pointer;
@@ -49,109 +48,76 @@ namespace ft
 
 	template <typename T>
 	struct iterator_traits<const T*> {
-		typedef ft::random_access_iterator_tag		iterator_category;
+		typedef random_access_iterator_tag			iterator_category;
 		typedef T									value_type;
 		typedef std::ptrdiff_t						difference_type;
 		typedef const T*							pointer;
 		typedef const T&							reference;
 	};
 
-	// * === ITER_CAT === * //
-
-	template <typename C, typename T, typename D, typename Pt, typename Rt> inline
-	C Iter_cat(const iterator<C, T, D, Pt, Rt>&) {
+	template <typename C, typename T, typename D, typename Pt, typename Rt>
+	C iterator_category(const iterator<C, T, D, Pt, Rt>&) {
 		C X;
 		return X;
 	}
 
-	template<typename T> inline
-	ft::random_access_iterator_tag Iter_cat(const T*) {
-		ft::random_access_iterator_tag X;
+	template<typename T>
+	input_iterator_tag iterator_category(const T*) {
+		input_iterator_tag X;
 		return X;
 	}
 
-	inline ft::Int_iterator_tag Iter_cat(bool) { 
-		ft::Int_iterator_tag X; 
-		return X; 
+	template<typename T>
+	output_iterator_tag iterator_category(const T*) {
+		output_iterator_tag X;
+		return X;
 	}
 
-	inline ft::Int_iterator_tag Iter_cat(char) { 
-		ft::Int_iterator_tag X; 
-		return X; 
+	template<typename T>
+	forward_iterator_tag iterator_category(const T*) {
+		forward_iterator_tag X;
+		return X;
 	}
 
-	inline ft::Int_iterator_tag Iter_cat(signed char) { 
-		ft::Int_iterator_tag X; 
-		return X; 
+	template<typename T>
+	bidirectional_iterator_tag iterator_category(const T*) {
+		bidirectional_iterator_tag X;
+		return X;
 	}
 
-	inline ft::Int_iterator_tag Iter_cat(unsigned char) { 
-		ft::Int_iterator_tag X; 
-		return X; 
+	template<typename T>
+	random_access_iterator_tag iterator_category(const T*) {
+		random_access_iterator_tag X;
+		return X;
 	}
 
-	inline ft::Int_iterator_tag Iter_cat(wchar_t) { 
-		ft::Int_iterator_tag X; 
-		return X; 
-	}
-
-	inline ft::Int_iterator_tag Iter_cat(short) { 
-		ft::Int_iterator_tag X; 
-		return X; 
-	}
-
-	inline ft::Int_iterator_tag Iter_cat(unsigned short) { 
-		ft::Int_iterator_tag X; 
-		return X; 
-	}
-
-	inline ft::Int_iterator_tag Iter_cat(int) { 
-		ft::Int_iterator_tag X; 
-		return X; 
-	}
-
-	inline ft::Int_iterator_tag Iter_cat(unsigned int) { 
-		ft::Int_iterator_tag X; 
-		return X; 
-	}
-
-	inline ft::Int_iterator_tag Iter_cat(long) { 
-		ft::Int_iterator_tag X; 
-		return X; 
-	}
-
-	inline ft::Int_iterator_tag Iter_cat(unsigned long) { 
-		ft::Int_iterator_tag X; 
-		return X; 
-	}
-
-	template <typename InIter, typename D, typename IterCategory>
-	void	my_distance_helper(InIter first, InIter last, D& dist, ft::input_iterator_tag) {
+	template <typename Iter, typename D>
+	void	my_distance_helper(Iter first, Iter last, D& dist, input_iterator_tag) {
 		for(; first != last; ++first)
 			++dist;
 	}
 
-	template <typename RanIt, typename D>
-	void	my_distance_helper(RanIt first, RanIt last, D& dist, ft::random_access_iterator_tag) {
+	template <typename Iter, typename D>
+	void	my_distance_helper(Iter first, Iter last, D& dist, random_access_iterator_tag) {
 		dist += last - first;
 	}
 
-	template <typename InIter>
-	typename ft::iterator_traits<InIter>::difference_type distance (InIter first, InIter last) {
-		typename ft::iterator_traits<InIter>::difference_type dist = 0;
-		my_distance_helper(first, last, dist, Iter_cat(first));
+	template <typename Iter>
+	typename ft::iterator_traits<Iter>::difference_type distance (Iter first, Iter last) {
+		typename ft::iterator_traits<Iter>::difference_type dist = 0;
+		my_distance_helper(first, last, dist, ft::iterator_category(first));
 		return dist;
 	}
 
-	template<typename Iterator, typename IterCategory>
-	void my_advance_helper(Iterator& iter, IterCategory, int n) {
+	template<typename Iter, typename IterCategory>
+	void my_advance_helper(Iter& iter, IterCategory, int n) {
 		for (int i = 0; i < n; ++i) {
 			++iter;
 		}
 	}
 
-	template<typename Iterator>
-	void my_advance_helper(Iterator& iter, ft::bidirectional_iterator_tag, int n) {
+	template<typename Iter>
+	void my_advance_helper(Iter& iter, bidirectional_iterator_tag, int n) {
 		if (n > 0) {
 			while (n--) {
 				++iter;
@@ -164,14 +130,14 @@ namespace ft
 		}
 	}
 
-	template<typename Iterator>
-	void my_advance_helper(Iterator& iter, ft::random_access_iterator_tag, int n) {
+	template<typename Iter>
+	void my_advance_helper(Iter& iter, random_access_iterator_tag, int n) {
 		iter += n;
 	}
 
-	template<typename Iterator>
-	void advance(Iterator& iter, int n) {
-		my_advance_helper(iter, typename ft::iterator_traits<Iterator>::iterator_category(), n);
+	template<typename Iter>
+	void advance(Iter& iter, int n) {
+		my_advance_helper(iter, typename iterator_traits<Iter>::iterator_category(), n);
 	}
 }
 

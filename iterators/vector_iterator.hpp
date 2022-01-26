@@ -7,18 +7,18 @@ namespace ft {
 	template<typename T>
 	class random_access_iterator : public ft::iterator<random_access_iterator_tag, T> {
 	public:
-		typedef typename ft::iterator<ft::random_access_iterator_tag, T>::iterator_category	iterator_category;
-		typedef typename ft::iterator<ft::random_access_iterator_tag, T>::value_type		value_type;
-		typedef typename ft::iterator<ft::random_access_iterator_tag, T>::difference_type	difference_type;
-		typedef typename ft::iterator<ft::random_access_iterator_tag, T>::pointer			pointer;
-		typedef typename ft::iterator<ft::random_access_iterator_tag, T>::reference			reference;
+		typedef typename iterator<random_access_iterator_tag, T>::iterator_category	iterator_category;
+		typedef typename iterator<random_access_iterator_tag, T>::value_type		value_type;
+		typedef typename iterator<random_access_iterator_tag, T>::difference_type	difference_type;
+		typedef typename iterator<random_access_iterator_tag, T>::pointer			pointer;
+		typedef typename iterator<random_access_iterator_tag, T>::reference			reference;
 
 	protected:
 		pointer ptr;
 
 	public:
 
-		random_access_iterator(void) {}
+		random_access_iterator(void) { ptr = NULL; }
 		random_access_iterator(pointer ptr) : ptr(ptr) {}
 		random_access_iterator(const random_access_iterator &source) { *this = source; }
 		virtual ~random_access_iterator() {}

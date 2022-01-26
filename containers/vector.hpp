@@ -4,8 +4,6 @@
 # include <memory>
 # include <limits>
 # include <stdexcept>
-# include "../iterators/iterator.hpp"
-# include "../iterators/vector_iterator.hpp"
 # include "../iterators/reverse_iterator.hpp"
 # include "../common/algorithm.hpp"
 # include "../common/type_traits.hpp"
@@ -83,8 +81,14 @@ namespace ft
 			}
 
 			template <typename Iter>
-			void assign(Iter first, Iter last) {
-				Assign(first, last, Iter_cat(first));
+			void assign(Iter first, Iter last, typename ft::enable_if<!ft::is_integral<Iter>::value >::type* = 0) {
+				erase(begin(), end());
+				insert(begin(), first, last);
+			}
+
+			template <typename Iter>
+			void assign(Iter first, Iter last, typename ft::enable_if<ft::is_integral<Iter>::value >::type* = 0) {
+				assign(static_cast<size_type>(first), static_cast<size_type>(last));
 			}
 
 			allocator_type get_allocator() const { return _alloc; }
@@ -179,7 +183,7 @@ namespace ft
 
 			iterator insert(iterator pos, const T &val) {
 				size_type offset = size() == 0 ? 0 : pos - begin();
-				insert(pos, (size_type)1, val);
+				insert(pos, static_cast<size_type>(1), val);
 				return begin() + offset;
 			}
 
@@ -234,8 +238,62 @@ namespace ft
 			}
 
 			template <typename Iter>
-			void insert(iterator pos, Iter first, Iter last) {
-				Insert(pos, first, last, Iter_cat(first));
+			void insert(iterator pos, Iter first, Iter last, typename ft::enable_if<!ft::is_integral<Iter>::value >::type* = 0) {
+					size_type cnt = ft::distance(first, last);
+					size_type cap = capacity();
+					if (cnt == 0) { ; }
+					else if (max_size() - size() < cnt) {
+						Xlen();
+					}
+					else if (cap < size() + cnt) {
+						cap = max_size() - cap / 2 < cap ? 0 : cap + cap / 2;
+						if (cap < size() + cnt)
+							cap = size() + cnt;
+						pointer ptr = _alloc.allocate(cap);
+						pointer tmpptr;
+						try {
+							tmpptr = Ucopy(begin(), pos, ptr);
+							tmpptr = Ucopy(first, last, tmpptr);
+							Ucopy(pos, end(), tmpptr);
+						} 
+						catch(...) {
+							Destroy(ptr, tmpptr);
+							_alloc.deallocate(ptr, cap);
+							throw;
+						}
+						if (_first != 0) {
+							Destroy(_first, _last);
+							_alloc.deallocate(_first, _end - _first);
+						}
+						_end = ptr + cap;
+						_last = ptr + size() + cnt;
+						_first = ptr;
+					}
+					else if ((size_type)(end() - pos) < cnt) {
+						Ucopy(pos, end(), pos.base() + cnt);
+						Iter mid = first;
+						ft::advance(mid, end() - pos);
+						try {
+							Ucopy(mid, last, _last);
+						}
+						catch(...) {
+							Destroy(pos.base() + cnt, _last + cnt);
+							throw;
+						}
+						_last += cnt;
+						ft::copy(first, mid, pos);
+					}
+					else if (0 < cnt) {
+						iterator tmpend = end();
+						_last = Ucopy(tmpend - cnt, tmpend, _last);
+						ft::reverse_copy(pos, tmpend - cnt, tmpend);
+						ft::copy(first, last, pos);
+					}
+			}
+
+			template <typename Iter>
+			void insert(iterator pos, Iter first, Iter last, typename ft::enable_if<ft::is_integral<Iter>::value >::type* = 0) {
+				insert(pos, static_cast<size_type>(first), static_cast<value_type>(last));
 			}
 
 			iterator erase(iterator pos) {
@@ -301,16 +359,16 @@ namespace ft
 				allocator_type _alloc;
 
 				template<typename Iter>
-				void Construct(Iter first, Iter last, typename ft::enable_if<!std::is_integral<Iter>::value, Iter>::type* = 0) {
+				void Construct(Iter first, Iter last, typename ft::enable_if<!std::is_integral<Iter>::value>::type* = 0) {
 					Buy(0);
 					insert(begin(), first, last);
 				}
 
 				template<typename Iter>
-				void Construct(Iter first, Iter last, typename ft::enable_if<std::is_integral<Iter>::value, Iter>::type* = 0) {
+				void Construct(Iter first, Iter last, typename ft::enable_if<std::is_integral<Iter>::value>::type* = 0) {
 					size_type N = (size_type)first;
 					if (Buy(N)) {
-						_last = Ufill(_first, N, (T)last);
+						_last = Ufill(_first, N, static_cast<value_type>(last));
 					}
 				}
 
@@ -371,81 +429,65 @@ namespace ft
 
 				void Xran() const { throw std::out_of_range("vector<T> subscript"); }
 
-				template<typename Iter>
-				void Assign(Iter first, Iter last, ft::Int_iterator_tag) {
-					assign((size_type)first, (T)last);
-				}
+				// template <typename Iter>
+				// void InsertIt(iterator pos, Iter first, Iter last, ft::input_iterator_tag) {
+				// 	for(; first != last; ++first, ++pos)
+				// 		pos = insert(pos, *first);
+				// }
 
-				template<typename Iter>
-				void Assign(Iter first, Iter last, ft::input_iterator_tag) {
-					erase(begin(), end());
-					insert(begin(), first, last);
-				}
-
-				template <typename Iter>
-				void Insert(iterator pos, Iter first, Iter last, ft::Int_iterator_tag) {
-					insert(pos, (size_type)first, (T)last);
-				}
-
-				template <typename Iter>
-				void Insert(iterator pos, Iter first, Iter last, ft::input_iterator_tag) {
-					for(; first != last; ++first, ++pos)
-						pos = insert(pos, *first);
-				}
-
-				template<typename Iter>
-				void Insert(iterator pos, Iter first, Iter last, ft::forward_iterator_tag) {
-					size_type cnt = ft::distance(first, last);
-					size_type cap = capacity();
-					if (cnt == 0) { ; }
-					else if (max_size() - size() < cnt) {
-						Xlen();
-					}
-					else if (cap < size() + cnt) {
-						cap = max_size() - cap / 2 < cap ? 0 : cap + cap / 2;
-						if (cap < size() + cnt)
-							cap = size() + cnt;
-						pointer ptr = _alloc.allocate(cap);
-						pointer tmpptr;
-						try {
-							tmpptr = Ucopy(begin(), pos, ptr);
-							tmpptr = Ucopy(first, last, tmpptr);
-							Ucopy(pos, end(), tmpptr);
-						} 
-						catch(...) {
-							Destroy(ptr, tmpptr);
-							_alloc.deallocate(ptr, cap);
-							throw;
-						}
-						if (_first != 0) {
-							Destroy(_first, _last);
-							_alloc.deallocate(_first, _end - _first);
-						}
-						_end = ptr + cap;
-						_last = ptr + size() + cnt;
-						_first = ptr;
-					}
-					else if ((size_type)(end() - pos) < cnt) {
-						Ucopy(pos, end(), pos.base() + cnt);
-						Iter mid = first;
-						ft::advance(mid, end() - pos);
-						try {
-							Ucopy(mid, last, _last);
-						}
-						catch(...) {
-							Destroy(pos.base() + cnt, _last + cnt);
-							throw;
-						}
-						_last += cnt;
-						ft::copy(first, mid, pos);
-					}
-					else if (0 < cnt) {
-						iterator tmpend = end();
-						_last = Ucopy(tmpend - cnt, tmpend, _last);
-						ft::reverse_copy(pos, tmpend - cnt, tmpend);
-						ft::copy(first, last, pos);
-					}
-				}
+				// template<typename Iter>
+				// void InsertIt(iterator pos, Iter first, Iter last, ft::forward_iterator_tag) {
+				// 	size_type cnt = ft::distance(first, last);
+				// 	size_type cap = capacity();
+				// 	if (cnt == 0) { ; }
+				// 	else if (max_size() - size() < cnt) {
+				// 		Xlen();
+				// 	}
+				// 	else if (cap < size() + cnt) {
+				// 		cap = max_size() - cap / 2 < cap ? 0 : cap + cap / 2;
+				// 		if (cap < size() + cnt)
+				// 			cap = size() + cnt;
+				// 		pointer ptr = _alloc.allocate(cap);
+				// 		pointer tmpptr;
+				// 		try {
+				// 			tmpptr = Ucopy(begin(), pos, ptr);
+				// 			tmpptr = Ucopy(first, last, tmpptr);
+				// 			Ucopy(pos, end(), tmpptr);
+				// 		} 
+				// 		catch(...) {
+				// 			Destroy(ptr, tmpptr);
+				// 			_alloc.deallocate(ptr, cap);
+				// 			throw;
+				// 		}
+				// 		if (_first != 0) {
+				// 			Destroy(_first, _last);
+				// 			_alloc.deallocate(_first, _end - _first);
+				// 		}
+				// 		_end = ptr + cap;
+				// 		_last = ptr + size() + cnt;
+				// 		_first = ptr;
+				// 	}
+				// 	else if ((size_type)(end() - pos) < cnt) {
+				// 		Ucopy(pos, end(), pos.base() + cnt);
+				// 		Iter mid = first;
+				// 		ft::advance(mid, end() - pos);
+				// 		try {
+				// 			Ucopy(mid, last, _last);
+				// 		}
+				// 		catch(...) {
+				// 			Destroy(pos.base() + cnt, _last + cnt);
+				// 			throw;
+				// 		}
+				// 		_last += cnt;
+				// 		ft::copy(first, mid, pos);
+				// 	}
+				// 	else if (0 < cnt) {
+				// 		iterator tmpend = end();
+				// 		_last = Ucopy(tmpend - cnt, tmpend, _last);
+				// 		ft::reverse_copy(pos, tmpend - cnt, tmpend);
+				// 		ft::copy(first, last, pos);
+				// 	}
+				// }
 
 	}; // class vector
 

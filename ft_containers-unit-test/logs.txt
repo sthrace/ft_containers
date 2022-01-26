@@ -1,0 +1,42 @@
+In file included from ../vector_tests/constructor(std iterators).cpp:2:
+In file included from ../vector_tests/__service.ipp:3:
+In file included from ../vector_tests/../../../containers/vector.hpp:7:
+In file included from ../vector_tests/../../../containers/../iterators/reverse_iterator.hpp:4:
+In file included from ../vector_tests/../../../containers/../iterators/vector_iterator.hpp:4:
+../vector_tests/../../../containers/../iterators/iterator.hpp:108:41: error: no matching function for call to 'iterator_category'
+                my_distance_helper(first, last, dist, ft::iterator_category(first));
+                                                      ^~~~~~~~~~~~~~~~~~~~~
+../vector_tests/../../../containers/vector.hpp:242:26: note: in instantiation of function template specialization 'ft::distance<std::__1::__wrap_iter<int *> >' requested here
+                                        size_type cnt = ft::distance(first, last);
+                                                            ^
+../vector_tests/../../../containers/vector.hpp:364:6: note: in instantiation of function template specialization 'ft::vector<int, std::__1::allocator<int> >::insert<std::__1::__wrap_iter<int *> >' requested here
+                                        insert(begin(), first, last);
+                                        ^
+../vector_tests/../../../containers/vector.hpp:43:5: note: in instantiation of function template specialization 'ft::vector<int, std::__1::allocator<int> >::Construct<std::__1::__wrap_iter<int *> >' requested here
+                                Construct(first, last);                                 
+                                ^
+../vector_tests/constructor(std iterators).cpp:26:15: note: in instantiation of function template specialization 'ft::vector<int, std::__1::allocator<int> >::vector<std::__1::__wrap_iter<int *> >' requested here
+        _vector<int> tmp2(tmp.begin(), tmp.end());
+                     ^
+../vector_tests/constructor(std iterators).cpp:37:85: note: in instantiation of function template specialization 'constructor_std_test<int>' requested here
+        exit(run_vector_unit_test<int>("constructor(std iterators)", constructor_std_test, constructor_std_test));
+                                                                                           ^
+../vector_tests/../../../containers/../iterators/iterator.hpp:59:4: note: candidate template ignored: could not match 'iterator' against '__wrap_iter'
+        C iterator_category(const iterator<C, T, D, Pt, Rt>&) {
+          ^
+../vector_tests/../../../containers/../iterators/iterator.hpp:65:21: note: candidate template ignored: could not match 'const T *' against 'std::__1::__wrap_iter<int *>'
+        input_iterator_tag iterator_category(const T*) {
+                           ^
+../vector_tests/../../../containers/../iterators/iterator.hpp:71:22: note: candidate template ignored: could not match 'const T *' against 'std::__1::__wrap_iter<int *>'
+        output_iterator_tag iterator_category(const T*) {
+                            ^
+../vector_tests/../../../containers/../iterators/iterator.hpp:77:23: note: candidate template ignored: could not match 'const T *' against 'std::__1::__wrap_iter<int *>'
+        forward_iterator_tag iterator_category(const T*) {
+                             ^
+../vector_tests/../../../containers/../iterators/iterator.hpp:83:29: note: candidate template ignored: could not match 'const T *' against 'std::__1::__wrap_iter<int *>'
+        bidirectional_iterator_tag iterator_category(const T*) {
+                                   ^
+../vector_tests/../../../containers/../iterators/iterator.hpp:89:29: note: candidate template ignored: could not match 'const T *' against 'std::__1::__wrap_iter<int *>'
+        random_access_iterator_tag iterator_category(const T*) {
+                                   ^
+1 error generated.
