@@ -11,7 +11,7 @@ namespace ft {
 	}
 
 	template<typename BidIt, typename OutIt> inline
-	OutIt copy_backward(BidIt first, BidIt last, OutIt X) {
+	OutIt reverse_copy(BidIt first, BidIt last, OutIt X) {
 		for (; first != last; ++X) {
 			*X = *--last;
 		}

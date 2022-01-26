@@ -7,7 +7,6 @@
 namespace ft {
 	template <typename Iter>
 	class reverse_iterator {
-	
 	public:
 	typedef Iter													iterator_type;
 	typedef typename ft::iterator_traits<Iter>::iterator_category	iterator_category;

@@ -1,6 +1,8 @@
 #ifndef ITERATOR_HPP
 # define ITERATOR_HPP
 
+# include "../common/utility.hpp"
+
 namespace ft
 {
 	struct input_iterator_tag {};
@@ -8,6 +10,7 @@ namespace ft
 	struct forward_iterator_tag : public input_iterator_tag { };
 	struct bidirectional_iterator_tag : public forward_iterator_tag { };
 	struct random_access_iterator_tag : public bidirectional_iterator_tag {};
+	struct Int_iterator_tag {};
 
 	template <typename C, typename T, typename Dist = std::ptrdiff_t, typename Pt = T*, typename Rt = T&>
 	struct iterator {
@@ -18,7 +21,15 @@ namespace ft
 		typedef Rt		reference;
 	};
 
-	template<typename Iter>
+	template<typename T, typename D, typename Pt, typename Rt>
+	struct BidIt : public iterator<ft::bidirectional_iterator_tag, T, D, Pt, Rt> {};
+
+	template<typename T, typename D, typename Pt, typename Rt>
+	struct RanIt : public iterator<ft::random_access_iterator_tag, T, D, Pt, Rt> {};
+
+	struct OutIt : public iterator<ft::output_iterator_tag, void, void, void, void> {};
+
+	template <typename Iter>
 	struct iterator_traits {
 		typedef typename Iter::iterator_category	iterator_category;
 		typedef typename Iter::value_type			value_type;
@@ -27,7 +38,7 @@ namespace ft
 		typedef typename Iter::reference			reference;
 	};
 
-	template<typename T>
+	template <typename T>
 	struct iterator_traits<T*> {
 		typedef ft::random_access_iterator_tag		iterator_category;
 		typedef T									value_type;
@@ -36,7 +47,7 @@ namespace ft
 		typedef T&									reference;
 	};
 
-	template<typename T>
+	template <typename T>
 	struct iterator_traits<const T*> {
 		typedef ft::random_access_iterator_tag		iterator_category;
 		typedef T									value_type;
@@ -45,23 +56,91 @@ namespace ft
 		typedef const T&							reference;
 	};
 
+	// * === ITER_CAT === * //
+
+	template <typename C, typename T, typename D, typename Pt, typename Rt> inline
+	C Iter_cat(const iterator<C, T, D, Pt, Rt>&) {
+		C X;
+		return X;
+	}
+
+	template<typename T> inline
+	ft::random_access_iterator_tag Iter_cat(const T*) {
+		ft::random_access_iterator_tag X;
+		return X;
+	}
+
+	inline ft::Int_iterator_tag Iter_cat(bool) { 
+		ft::Int_iterator_tag X; 
+		return X; 
+	}
+
+	inline ft::Int_iterator_tag Iter_cat(char) { 
+		ft::Int_iterator_tag X; 
+		return X; 
+	}
+
+	inline ft::Int_iterator_tag Iter_cat(signed char) { 
+		ft::Int_iterator_tag X; 
+		return X; 
+	}
+
+	inline ft::Int_iterator_tag Iter_cat(unsigned char) { 
+		ft::Int_iterator_tag X; 
+		return X; 
+	}
+
+	inline ft::Int_iterator_tag Iter_cat(wchar_t) { 
+		ft::Int_iterator_tag X; 
+		return X; 
+	}
+
+	inline ft::Int_iterator_tag Iter_cat(short) { 
+		ft::Int_iterator_tag X; 
+		return X; 
+	}
+
+	inline ft::Int_iterator_tag Iter_cat(unsigned short) { 
+		ft::Int_iterator_tag X; 
+		return X; 
+	}
+
+	inline ft::Int_iterator_tag Iter_cat(int) { 
+		ft::Int_iterator_tag X; 
+		return X; 
+	}
+
+	inline ft::Int_iterator_tag Iter_cat(unsigned int) { 
+		ft::Int_iterator_tag X; 
+		return X; 
+	}
+
+	inline ft::Int_iterator_tag Iter_cat(long) { 
+		ft::Int_iterator_tag X; 
+		return X; 
+	}
+
+	inline ft::Int_iterator_tag Iter_cat(unsigned long) { 
+		ft::Int_iterator_tag X; 
+		return X; 
+	}
 
 	template <typename InIter, typename D, typename IterCategory>
-	void	my_distance_helper(InIter first, InIter last, D& N, IterCategory) {
+	void	my_distance_helper(InIter first, InIter last, D& dist, ft::input_iterator_tag) {
 		for(; first != last; ++first)
-			++N;
+			++dist;
 	}
 
 	template <typename RanIt, typename D>
-	void	my_distance_helper(RanIt first, RanIt last, D& N, ft::random_access_iterator_tag) {
-		N += last - first;
+	void	my_distance_helper(RanIt first, RanIt last, D& dist, ft::random_access_iterator_tag) {
+		dist += last - first;
 	}
 
 	template <typename InIter>
 	typename ft::iterator_traits<InIter>::difference_type distance (InIter first, InIter last) {
-		typename ft::iterator_traits<InIter>::difference_type N = 0;
-		my_distance_helper(first, last, N, typename ft::iterator_traits<InIter>::iterator_category());
-		return N;
+		typename ft::iterator_traits<InIter>::difference_type dist = 0;
+		my_distance_helper(first, last, dist, Iter_cat(first));
+		return dist;
 	}
 
 	template<typename Iterator, typename IterCategory>
