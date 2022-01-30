@@ -3,7 +3,6 @@
 
 # include "vector.hpp"
 # include <vector>
-# include <deque>
 
 namespace ft {
 	template<typename T, class C=ft::vector<T> > 

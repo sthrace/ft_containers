@@ -4,8 +4,10 @@
 namespace ft {
 	template<typename InIt, typename OutIt>
 	OutIt copy(InIt first, InIt last, OutIt X) {
-		for (; first != last; ++X) {
-			*X = *++first;
+		while (first != last) {
+			*X = *first;
+			++first;
+			++X;
 		}
 		return X;
 	}
