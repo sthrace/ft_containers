@@ -4,7 +4,7 @@
 # include "../common/tree.hpp"
 
 namespace ft {
-template<typename K, typename T, typename Pr, typename A, bool Mfl>
+template <typename K, typename T, typename Pr, typename A, bool Mfl>
 class Tmap_traits {
 	public:
 		typedef K												key_type;
@@ -16,7 +16,7 @@ class Tmap_traits {
 		class value_compare : public ft::binary_function<value_type, value_type, bool> {
 			public:
 				bool operator()(const value_type& X, const value_type& Y) const {
-					return comp(X._first, Y._first);
+					return comp(X.first, Y.first);
 				}
 				value_compare(key_compare comp) : comp(comp) {}
 			protected:
@@ -35,20 +35,12 @@ class Tmap_traits {
 			typedef ft::Tree<Tmap_traits<K, T, Pr, A, false> >	Mybase;
 			typedef K											key_type;
 			typedef T											mapped_type;
-			// typedef T											referent_type;
 			typedef Pr											key_compare;
-			// typedef typename Mybase::value_compare				value_compare;
 			typedef typename Mybase::allocator_type				allocator_type;
-			// typedef typename Mybase::size_type					size_type;
-			// typedef typename Mybase::difference_type			difference_type;
-			// typedef typename Mybase::pointer					pointer;
-			// typedef typename Mybase::const_pointer				const_pointer;
-			// typedef typename Mybase::reference					reference;
-			// typedef typename Mybase::const_reference			const_reference;
 			typedef typename Mybase::iterator					iterator;
 			typedef typename Mybase::const_iterator				const_iterator;
-			// typedef typename Mybase::reverse_iterator			reverse_iterator;
-			// typedef typename Mybase::const_reverse_iterator		const_reverse_iterator;
+			typedef typename Mybase::reverse_iterator			reverse_iterator;
+			typedef typename Mybase::const_reverse_iterator		const_reverse_iterator;
 			typedef typename Mybase::value_type					value_type;
 
 			explicit map(const key_compare& comp = key_compare()) : Mybase(comp, allocator_type()) {}
@@ -67,7 +59,6 @@ class Tmap_traits {
 			}
 
 			map(const map& X) : Mybase(X.comp, X._alloc_val) { 
-				std::cout << "Map Copy constructor" << std::endl;
 				this->insert(X.begin(), X.end()); }
 			
 			mapped_type& operator[](const key_type& key) {

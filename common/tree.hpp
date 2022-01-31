@@ -54,7 +54,6 @@ namespace ft {
 			insert(first, last);
 		}
 		Tree(const Tree& X) : Tr(X.key_comp(), _alloc_val(X.get_allocator()), _alloc_node(X.get_allocator()), _alloc_ptr(X.get_allocator())) {
-			std::cout << "Tree Copy constructor" << std::endl;
 			Init();
 			Copy(X);
 		}
@@ -122,8 +121,8 @@ namespace ft {
 			}
 			else {
 				iterator it = pos;
-				if (this->comp(GetKey((--it).base()), this->getKeyByVal(val)) && this->comp(this->getKeyByVal()(val), GetKey(pos.base()))) {
-					if (pos.base()->_right->_isnil)
+				if (this->comp(GetKey((--it).base()), this->getKeyByVal(val)) && this->comp(this->getKeyByVal(val), GetKey(pos.base()))) {
+					if (it.base()->_right->_isnil)
 						return Insert(false, it.base(), val);
 					else
 						return Insert(true, pos.base(), val);
@@ -134,8 +133,7 @@ namespace ft {
 
 		template <class It>
 		void insert(It first, It last) {
-			std::cout << "Insert(iterators)" << std::endl;
-			for (; first != last; --last)
+			for (; first != last; ++first)
 				insert(*first);
 		}
 
@@ -154,7 +152,7 @@ namespace ft {
 				Y = Min(Y->_right), X = Y->_right;
 			if (Y == Z) {
 				Xpar = Z->_parent;
-				if (X->_isnil)
+				if (!X->_isnil)
 					X->_parent = Xpar;
 				if (Root() == Z)
 					Root() = X;
@@ -299,7 +297,7 @@ namespace ft {
 		}
 
 		const_iterator find(const key_type& key) const {
-			iterator pos = lower_bound(key);
+			const_iterator pos = lower_bound(key);
 			return pos == end() || this->comp(key, GetKey(pos.base())) ? end() : pos;
 		}
 
@@ -319,15 +317,13 @@ namespace ft {
 
 		void swap(Tree& X) {
 			if (get_allocator() == X.get_allocator()) {
-				ft::swap(this->comp, X.comp);
-				ft::swap(_head, X._head);
-				ft::swap(_size, X._size);
+				ft::swap(_alloc_node, X._alloc_node);
+				ft::swap(_alloc_val, X._alloc_val);
+				ft::swap(_alloc_ptr, X._alloc_ptr);
 			}
-			else {
-				Tree temp = *this;
-				*this = X;
-				X = temp;
-			}
+			ft::swap(this->comp, X.comp);
+			ft::swap(_head, X._head);
+			ft::swap(_size, X._size);
 		}
 
 
@@ -419,10 +415,10 @@ namespace ft {
 			_size = 0;
 		}
 
-		iterator Insert(bool Addleft, Node* ptr, const value_type& val) {
+		iterator Insert(bool Addleft, Node* Y, const value_type& val) {
 			if (max_size() - 1 <= _size)
 				throw std::length_error("map/set<T> too long");
-			Node* Z = Buynode(ptr, RED);
+			Node* Z = Buynode(Y, RED);
 			Z->_left = _head;
 			Z->_right = _head;
 			try {
@@ -433,27 +429,27 @@ namespace ft {
 				throw;
 			}
 			++_size;
-			if (ptr == _head) {
+			if (Y == _head) {
 				Root() = Z;
 				Lmost() = Z;
 				Rmost() = Z;
 			}
 			else if (Addleft) {
-				ptr->_left = Z;
-				if (ptr == Lmost())
+				Y->_left = Z;
+				if (Y == Lmost())
 					Lmost() = Z;
 			}
 			else {
-				ptr->_right = Z;
-				if (ptr == Rmost())
+				Y->_right = Z;
+				if (Y == Rmost())
 					Rmost() = Z;
 			}
 			for (Node* X = Z; X->_parent->_color == RED; ) {
 				if (X->_parent == X->_parent->_parent->_left) {
-					ptr = X->_parent->_parent->_right;
-					if (ptr->_color == RED) {
+					Y = X->_parent->_parent->_right;
+					if (Y->_color == RED) {
 						X->_parent->_color = BLACK;
-						ptr->_color = BLACK;
+						Y->_color = BLACK;
 						X->_parent->_parent->_color = RED;
 						X = X->_parent->_parent;
 					}
@@ -468,10 +464,10 @@ namespace ft {
 					}
 				}
 				else {
-					ptr = X->_parent->_parent->_left;
-					if (ptr->_color == RED) {
+					Y = X->_parent->_parent->_left;
+					if (Y->_color == RED) {
 						X->_parent->_color = BLACK;
-						ptr->_color = BLACK;
+						Y->_color = BLACK;
 						X->_parent->_parent->_color = RED;
 						X = X->_parent->_parent;
 					}
@@ -484,9 +480,9 @@ namespace ft {
 						X->_parent->_parent->_color = RED;
 						Lrotate(X->_parent->_parent);
 					}
-				}
-				Root()->_color = BLACK;
+				}	
 			}
+			Root()->_color = BLACK;
 			return iterator(Z);
 		}
 
@@ -508,7 +504,7 @@ namespace ft {
 		void Lrotate(Node* X) {
 			Node* Y = X->_right;
 			X->_right = Y->_left;
-			if (!(Y->_left->_isnil))
+			if (!Y->_left->_isnil)
 				Y->_left->_parent = X;
 			Y->_parent = X->_parent;
 			if (X == Root())
@@ -542,7 +538,7 @@ namespace ft {
 		void Rrotate(Node* X) {
 			Node* Y = X->_left;
 			X->_left = Y->_right;
-			if (!(Y->_right->_isnil))
+			if (!Y->_right->_isnil)
 				Y->_right->_parent = X;
 			Y->_parent = X->_parent;
 			if (X == Root())

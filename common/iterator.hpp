@@ -411,7 +411,7 @@ namespace ft
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::pointer			pointer;
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::reference			reference;
 
-		tree_iterator(void) { _ptr = NULL; }
+		tree_iterator(void) { _ptr = nullptr; }
 		tree_iterator(Node* ptr) : _ptr(ptr) {}
 		tree_iterator(const tree_iterator& x) { _ptr = x._ptr; }
 		~tree_iterator() {}
@@ -444,21 +444,11 @@ namespace ft
 			--*this;
 			return temp;
 		}
-
-		tree_iterator& operator+=(difference_type n) {
-			_ptr += n;
-			return *this; 
-		}
-
-		tree_iterator& operator-=(difference_type n) {
-			_ptr -= n;
-			return *this; 
-		}
 			
 		reference& operator*() { return _ptr->_value; }
 		const reference& operator*() const { return _ptr->_value; }
-		pointer operator->() { return &**_ptr; }
-		const pointer operator->() const { return &**_ptr; }
+		pointer operator->() { return &**this; }
+		const pointer operator->() const { return &**this; }
 
 		bool operator==(const tree_iterator& x) { return _ptr == x._ptr; }
 		bool operator!=(const tree_iterator& x) { return !(_ptr == x._ptr); }
@@ -476,31 +466,30 @@ namespace ft
 					_ptr = Max(_ptr->_left);
 				else {
 					Node* tmp;
-					while(!((tmp = _ptr->_parent)->_isnil) && _ptr == _ptr->_left)
+					while(!((tmp = _ptr->_parent)->_isnil) && _ptr == tmp->_left)
 						_ptr = tmp;
 					if (!tmp->_isnil)
 						_ptr = tmp;
 				}
 			}
 			void Inc() {
-				if (_ptr->_isnil)
-					;
+				if (_ptr->_isnil) { ; }
 				else if (!_ptr->_right->_isnil)
 					_ptr = Min(_ptr->_right);
 				else {
 					Node* tmp;
-					while(!((tmp = _ptr->_parent)->_isnil) && _ptr == _ptr->_right)
+					while(!((tmp = _ptr->_parent)->_isnil) && _ptr == tmp->_right)
 						_ptr = tmp;
 					_ptr = tmp;
 				}
 			}
-			Node*	Max(Node* ptr) {
+			static Node*	Max(Node* ptr) {
 				while (!ptr->_right->_isnil)
 					ptr = ptr->_right;
 				return ptr;
 			}
 
-			Node*	Min(Node* ptr) {
+			static Node*	Min(Node* ptr) {
 				while (!ptr->_left->_isnil)
 					ptr = ptr->_left;
 				return ptr;
@@ -517,7 +506,7 @@ namespace ft
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::pointer			pointer;
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::reference			reference;
 
-		const_tree_iterator(void) { _ptr = NULL; }
+		const_tree_iterator(void) { _ptr = nullptr; }
 		const_tree_iterator(Node* ptr) : _ptr(ptr) {}
 		const_tree_iterator(const const_tree_iterator& x) { _ptr = x._ptr; }
 		~const_tree_iterator() {}
@@ -550,16 +539,6 @@ namespace ft
 			--*this;
 			return temp;
 		}
-
-		const_tree_iterator& operator+=(difference_type n) {
-			_ptr += n;
-			return *this; 
-		}
-
-		const_tree_iterator& operator-=(difference_type n) {
-			_ptr -= n;
-			return *this; 
-		}
 			
 		reference& operator*() { return _ptr->_value; }
 		const reference& operator*() const { return _ptr->_value; }
@@ -582,31 +561,30 @@ namespace ft
 					_ptr = Max(_ptr->_left);
 				else {
 					Node* tmp;
-					while(!((tmp = _ptr->_parent)->_isnil) && _ptr == _ptr->_left)
+					while(!((tmp = _ptr->_parent)->_isnil) && _ptr == tmp->_left)
 						_ptr = tmp;
 					if (!tmp->_isnil)
 						_ptr = tmp;
 				}
 			}
 			void Inc() {
-				if (_ptr->_isnil)
-					;
+				if (_ptr->_isnil) { ; }
 				else if (!_ptr->_right->_isnil)
 					_ptr = Min(_ptr->_right);
 				else {
 					Node* tmp;
-					while(!((tmp = _ptr->_parent)->_isnil) && _ptr == _ptr->_right)
+					while(!((tmp = _ptr->_parent)->_isnil) && _ptr == tmp->_right)
 						_ptr = tmp;
 					_ptr = tmp;
 				}
 			}
-			Node*	Max(Node* ptr) {
+			static Node*	Max(Node* ptr) {
 				while (!ptr->_right->_isnil)
 					ptr = ptr->_right;
 				return ptr;
 			}
 
-			Node*	Min(Node* ptr) {
+			static Node*	Min(Node* ptr) {
 				while (!ptr->_left->_isnil)
 					ptr = ptr->_left;
 				return ptr;
