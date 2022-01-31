@@ -66,6 +66,6 @@ class Tmap_traits {
 				return (*pos).second;
 			}
 	};
-}; //namespace ft
+} //namespace ft
 
 #endif

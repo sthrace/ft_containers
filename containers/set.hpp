@@ -30,8 +30,7 @@ namespace ft {
 		typedef typename Mybase::const_iterator			const_iterator;
 		typedef typename Mybase::reverse_iterator		reverse_iterator;
 		typedef typename Mybase::const_reverse_iterator	const_reverse_iterator;
-
-		set() : Mybase(key_compare(), allocator_type()) {}
+		typedef typename Mybase::value_type				value_type;
 		
 		explicit set(const key_compare& comp = key_compare()) : Mybase(comp, allocator_type()) {}
 		
@@ -47,7 +46,8 @@ namespace ft {
 				this->insert(*first);
 		}
 		set(const set& X) : Mybase(X.comp, X._alloc_val) { 
-				this->insert(X.begin(), X.end()); }
+				this->insert(X.begin(), X.end()); 
+		}
 	};
 };
 
