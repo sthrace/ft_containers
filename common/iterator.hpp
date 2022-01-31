@@ -2,7 +2,7 @@
 # define ITERATOR_HPP
 
 # include <cstdlib>
-# include "tree.hpp"
+# include <iostream>
 
 namespace ft
 {
@@ -428,7 +428,7 @@ namespace ft
 			return *this;
 		}
 
-		tree_iterator operator++(int) { 
+		tree_iterator operator++(int) {	
 			tree_iterator temp = *this;
 			++*this;
 			return temp;
@@ -455,8 +455,8 @@ namespace ft
 			return *this; 
 		}
 			
-		reference& operator*() { return _ptr->value; }
-		const reference& operator*() const { return _ptr->value; }
+		reference& operator*() { return _ptr->_value; }
+		const reference& operator*() const { return _ptr->_value; }
 		pointer operator->() { return &**_ptr; }
 		const pointer operator->() const { return &**_ptr; }
 
@@ -470,39 +470,39 @@ namespace ft
 			Node*	_ptr;
 
 			void Dec() {
-				if (_ptr->isnil)
-					_ptr = _ptr->right;
-				else if (!_ptr->left->isnil)
-					_ptr = Max(_ptr->right);
+				if (_ptr->_isnil)
+					_ptr = _ptr->_right;
+				else if (!_ptr->_left->_isnil)
+					_ptr = Max(_ptr->_left);
 				else {
 					Node* tmp;
-					while(!((tmp = _ptr->parent->isnil)) && _ptr == _ptr->left)
+					while(!((tmp = _ptr->_parent)->_isnil) && _ptr == _ptr->_left)
 						_ptr = tmp;
-					if (!tmp->isnil)
+					if (!tmp->_isnil)
 						_ptr = tmp;
 				}
 			}
 			void Inc() {
-				if (_ptr->isnil)
+				if (_ptr->_isnil)
 					;
-				else if (!_ptr->right->isnil)
-					_ptr = Min(_ptr->right);
+				else if (!_ptr->_right->_isnil)
+					_ptr = Min(_ptr->_right);
 				else {
-					Node tmp;
-					while((!(tmp = _ptr->parent->isnil)) && _ptr == _ptr->right)
+					Node* tmp;
+					while(!((tmp = _ptr->_parent)->_isnil) && _ptr == _ptr->_right)
 						_ptr = tmp;
 					_ptr = tmp;
 				}
 			}
 			Node*	Max(Node* ptr) {
-				while (!ptr->right->_isNil)
+				while (!ptr->_right->_isnil)
 					ptr = ptr->_right;
 				return ptr;
 			}
 
 			Node*	Min(Node* ptr) {
-				while (!ptr->left->_isNil)
-					ptr = ptr->left;
+				while (!ptr->_left->_isnil)
+					ptr = ptr->_left;
 				return ptr;
 			}
 	};
@@ -561,8 +561,8 @@ namespace ft
 			return *this; 
 		}
 			
-		reference& operator*() { return _ptr->value; }
-		const reference& operator*() const { return _ptr->value; }
+		reference& operator*() { return _ptr->_value; }
+		const reference& operator*() const { return _ptr->_value; }
 		pointer operator->() { return &**_ptr; }
 		const pointer operator->() const { return &**_ptr; }
 
@@ -576,39 +576,39 @@ namespace ft
 			Node*	_ptr;
 
 			void Dec() {
-				if (_ptr->isnil)
-					_ptr = _ptr->right;
-				else if (!_ptr->left->isnil)
-					_ptr = Max(_ptr->right);
+				if (_ptr->_isnil)
+					_ptr = _ptr->_right;
+				else if (!_ptr->_left->_isnil)
+					_ptr = Max(_ptr->_left);
 				else {
 					Node* tmp;
-					while(!((tmp = _ptr->parent->isnil)) && _ptr == _ptr->left)
+					while(!((tmp = _ptr->_parent)->_isnil) && _ptr == _ptr->_left)
 						_ptr = tmp;
-					if (!tmp->isnil)
+					if (!tmp->_isnil)
 						_ptr = tmp;
 				}
 			}
 			void Inc() {
-				if (_ptr->isnil)
+				if (_ptr->_isnil)
 					;
-				else if (!_ptr->right->isnil)
-					_ptr = Min(_ptr->right);
+				else if (!_ptr->_right->_isnil)
+					_ptr = Min(_ptr->_right);
 				else {
-					Node tmp;
-					while((!(tmp = _ptr->parent->isnil)) && _ptr == _ptr->right)
+					Node* tmp;
+					while(!((tmp = _ptr->_parent)->_isnil) && _ptr == _ptr->_right)
 						_ptr = tmp;
 					_ptr = tmp;
 				}
 			}
 			Node*	Max(Node* ptr) {
-				while (!ptr->right->_isNil)
+				while (!ptr->_right->_isnil)
 					ptr = ptr->_right;
 				return ptr;
 			}
 
 			Node*	Min(Node* ptr) {
-				while (!ptr->left->_isNil)
-					ptr = ptr->left;
+				while (!ptr->_left->_isnil)
+					ptr = ptr->_left;
 				return ptr;
 			}
 	};
