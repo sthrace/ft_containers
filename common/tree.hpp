@@ -1,15 +1,12 @@
 #ifndef TREE_HPP
 # define TREE_HPP
 
-# include <functional>
 # include <memory>
 # include <stdexcept>
 # include "iterator.hpp"
 # include "utility.hpp"
 # include "functional.hpp"
 # include "algorithm.hpp"
-
-# include <iostream>
 
 namespace ft {
 	template <class Tr>
