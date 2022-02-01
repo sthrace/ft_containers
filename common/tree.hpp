@@ -57,7 +57,7 @@ namespace ft {
 			Init();
 			Copy(X);
 		}
-		~Tree() {
+		virtual ~Tree() {
 			erase(begin(), end());
 			Freenode(_head);
 			_head = 0, _size = 0;
@@ -336,8 +336,8 @@ namespace ft {
 
 		Node* Buynode(Node* x, char color) {
 			Node* node = _alloc_node.allocate(1);
-			_alloc_ptr.construct(&node->_left, nullptr);
-			_alloc_ptr.construct(&node->_right, nullptr);
+			_alloc_ptr.construct(&node->_left, NULL);
+			_alloc_ptr.construct(&node->_right, NULL);
 			_alloc_ptr.construct(&node->_parent, x);
 			node->_color = color;
 			node->_isnil = false;

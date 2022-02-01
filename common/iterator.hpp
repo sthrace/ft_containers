@@ -411,7 +411,7 @@ namespace ft
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::pointer			pointer;
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::reference			reference;
 
-		tree_iterator(void) { _ptr = nullptr; }
+		tree_iterator(void) { _ptr = NULL; }
 		tree_iterator(Node* ptr) : _ptr(ptr) {}
 		tree_iterator(const tree_iterator& x) { _ptr = x._ptr; }
 		~tree_iterator() {}
@@ -506,7 +506,7 @@ namespace ft
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::pointer			pointer;
 		typedef typename ft::iterator<ft::bidirectional_iterator_tag, T>::reference			reference;
 
-		const_tree_iterator(void) { _ptr = nullptr; }
+		const_tree_iterator(void) { _ptr = NULL; }
 		const_tree_iterator(Node* ptr) : _ptr(ptr) {}
 		const_tree_iterator(const tree_iterator<Node, T, T*, T&>& x) { _ptr = x.base(); }
 		const_tree_iterator(const const_tree_iterator& x) { _ptr = x._ptr; }

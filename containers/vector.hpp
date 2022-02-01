@@ -181,25 +181,25 @@ namespace ft {
 					cap = max_size() - cap / 2 < cap ? 0 : cap + cap / 2;
 					if (cap < size() + n)
 						cap = size() + n;
-						pointer ptr = _alloc.allocate(cap);
-						pointer tmpptr;
-						try {
-							tmpptr = Ucopy(begin(), pos, ptr);
-							tmpptr = Ufill(tmpptr, n, tmpval);
-							Ucopy(pos, end(), tmpptr);
-						}
-						catch(...) {
-							Destroy(ptr, tmpptr);
-							_alloc.deallocate(ptr, cap);
-							throw;
-						}
-						if (_first != 0) {
-							Destroy(_first, _last);
-							_alloc.deallocate(_first, _end - _first);
-						}
-						_end = ptr + cap;
-						_last = ptr + size() + n;
-						_first = ptr;
+					pointer ptr = _alloc.allocate(cap);
+					pointer tmpptr;
+					try {
+						tmpptr = Ucopy(begin(), pos, ptr);
+						tmpptr = Ufill(tmpptr, n, tmpval);
+						Ucopy(pos, end(), tmpptr);
+					}
+					catch(...) {
+						Destroy(ptr, tmpptr);
+						_alloc.deallocate(ptr, cap);
+						throw;
+					}
+					if (_first != 0) {
+						Destroy(_first, _last);
+						_alloc.deallocate(_first, _end - _first);
+					}
+					_end = ptr + cap;
+					_last = ptr + size() + n;
+					_first = ptr;
 				}
 				else if (static_cast<size_type>(end() - pos) < n) {
 					Ucopy(pos, end(), pos.base() + n);

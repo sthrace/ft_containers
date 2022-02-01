@@ -60,6 +60,8 @@ class Tmap_traits {
 
 			map(const map& X) : Mybase(X.comp, X._alloc_val) { 
 				this->insert(X.begin(), X.end()); }
+
+			virtual ~map() {}
 			
 			mapped_type& operator[](const key_type& key) {
 				iterator pos = this->insert(value_type(key, mapped_type())).first;

@@ -52,6 +52,8 @@ namespace ft {
 		set(const set& X) : Mybase(X.comp, X._alloc_val) { 
 				this->insert(X.begin(), X.end()); 
 		}
+
+		virtual ~set() {}
 	};
 };
 
