@@ -1,5 +1,5 @@
 NAME	= ft_containers
-SRCS	= main.cpp
+SRCS	= map_test.cpp
 HEADER	= algorithm.hpp \
 		  functional.hpp \
 		  iterator.hpp \

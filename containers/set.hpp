@@ -16,6 +16,9 @@ namespace ft {
 		typedef key_compare	value_compare;
 		const K& operator()(const value_type& X) const { return X; }
 	protected:
+		const key_type& getKeyByVal(const value_type& val) const {
+			return val;
+		}
 		Pr comp;
 	};
 
@@ -25,6 +28,7 @@ namespace ft {
 		typedef Tree<Tset_traits<K, Pr, A, false> >		Mybase;
 		typedef K										key_type;
 		typedef Pr 										key_compare;
+		typedef key_compare								value_compare;
 		typedef typename Mybase::allocator_type			allocator_type;
 		typedef typename Mybase::iterator				iterator;
 		typedef typename Mybase::const_iterator			const_iterator;

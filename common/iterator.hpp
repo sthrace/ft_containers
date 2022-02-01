@@ -508,6 +508,7 @@ namespace ft
 
 		const_tree_iterator(void) { _ptr = nullptr; }
 		const_tree_iterator(Node* ptr) : _ptr(ptr) {}
+		const_tree_iterator(const tree_iterator<Node, T, T*, T&>& x) { _ptr = x.base(); }
 		const_tree_iterator(const const_tree_iterator& x) { _ptr = x._ptr; }
 		~const_tree_iterator() {}
 
