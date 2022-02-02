@@ -333,8 +333,8 @@ namespace ft {
 
 		Node* Buynode(Node* x, char color) {
 			Node* node = _alloc_node.allocate(1);
-			_alloc_ptr.construct(&node->_left, NULL);
-			_alloc_ptr.construct(&node->_right, NULL);
+			// _alloc_ptr.construct(&node->_left, 0);
+			// _alloc_ptr.construct(&node->_right, 0);
 			_alloc_ptr.construct(&node->_parent, x);
 			node->_color = color;
 			node->_isnil = false;

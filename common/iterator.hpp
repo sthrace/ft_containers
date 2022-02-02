@@ -229,8 +229,8 @@ namespace ft
 			
 		reference& operator*() { return *_ptr; }
 		const reference& operator*() const { return *_ptr; }
-		pointer operator->() { return &**_ptr; }
-		const pointer operator->() const { return &**_ptr; }
+		pointer operator->() { return &**this; }
+		const pointer operator->() const { return &**this; }
 		reference operator[](difference_type idx) { return *(*this + idx); }
 		const reference operator[](difference_type idx) const { return *(*this + idx); }
 
@@ -542,8 +542,8 @@ namespace ft
 			
 		reference& operator*() { return _ptr->_value; }
 		const reference& operator*() const { return _ptr->_value; }
-		pointer operator->() { return &**_ptr; }
-		const pointer operator->() const { return &**_ptr; }
+		pointer operator->() { return &**this; }
+		const pointer operator->() const { return &**this; }
 
 		bool operator==(const const_tree_iterator& x) { return _ptr == x._ptr; }
 		bool operator!=(const const_tree_iterator& x) { return !(_ptr == x._ptr); }

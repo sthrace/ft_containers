@@ -374,6 +374,7 @@ void	constructor_test(void)
 
 int		main()
 {
+	unsigned int start_time =  clock();
 	constructor_test();
 	assignator_test();
 	begin_end_test();
@@ -393,6 +394,9 @@ int		main()
 	lower_upper_bound_test();
 	equal_range_test();
 	get_allocator_test();
+	unsigned int end_time = clock();
+    unsigned int search_time = end_time - start_time;
+    std::cout << " performance time is: " << search_time << std::endl;
 
 	return 0;
 }

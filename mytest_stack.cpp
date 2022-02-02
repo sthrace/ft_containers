@@ -94,11 +94,15 @@ void	constructor_test(void)
 
 int	main()
 {
+	unsigned int start_time =  clock();
 	constructor_test();
 	empty_test();
 	size_test();
 	top_test();
 	push_test();
 	pop_test();
+	unsigned int end_time = clock();
+    unsigned int search_time = end_time - start_time;
+    std::cout << " performance time is: " << search_time << std::endl;
 	return 0;
 }
